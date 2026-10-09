@@ -1,25 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:wajiha_game_core/wajiha_game_core.dart';
-import 'game_screen.dart';
+import 'package:flutter/services.dart';
+import 'screens/splash_screen.dart';
+import 'services/audio_service.dart';
+import 'services/settings_service.dart';
+import 'theme/fizz_art.dart';
+import 'theme/fizz_themes.dart';
 
-void main() => runApp(const BubblePopApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  final settings = FizzSettings();
+  await settings.load();
+  final audio = FizzAudio();
+  audio.configure(
+    musicOn: settings.musicOn,
+    sfxOn: settings.sfxOn,
+    volume: settings.volume,
+  );
+  runApp(BubblePopApp(settings: settings, audio: audio));
+}
 
-class BubblePopApp extends StatelessWidget {
-  const BubblePopApp({super.key});
+class BubblePopApp extends StatefulWidget {
+  final FizzSettings settings;
+  final FizzAudio audio;
+  const BubblePopApp({super.key, required this.settings, required this.audio});
+
+  @override
+  State<BubblePopApp> createState() => _BubblePopAppState();
+}
+
+class _BubblePopAppState extends State<BubblePopApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    widget.audio.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Pause (not stop) on interruption so music resumes exactly where it
+    // left off; game screens additionally freeze their engines.
+    if (state == AppLifecycleState.paused) {
+      widget.audio.onAppPaused();
+    } else if (state == AppLifecycleState.resumed) {
+      widget.audio.onAppResumed();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GameShell(
-      variant: ShellVariant.neonArcade,
-      title: 'Bubble Pop',
-      tagline: 'Aim true, match three, and pop your way to fizzy glory!',
-      emoji: '🫧',
-      slug: 'bubblepop',
-      howToPlay:
-          '• Drag to aim, release to fire your bubble.\n• Match 3 or more bubbles of the same color to pop them.\n• Bubbles left hanging with nothing above will drop!\n• Every 6 shots the ceiling drops — don\'t let bubbles cross the line!\n• Clear all 15 levels to become the Pop Master.',
-      playerOptions: const [1],
-      supportsBots: false,
-      gameBuilder: (ctx, players, cb) => BubblePopScreen(players: players, callbacks: cb),
+    return ListenableBuilder(
+      listenable: widget.settings,
+      builder: (_, _) => MaterialApp(
+        title: 'Bubble Pop',
+        debugShowCheckedModeBanner: false,
+        theme: Fizz.theme(FizzThemes.byId(widget.settings.themeId,
+            custom: widget.settings.customTheme)),
+        home: SplashScreen(audio: widget.audio, settings: widget.settings),
+      ),
     );
   }
 }
