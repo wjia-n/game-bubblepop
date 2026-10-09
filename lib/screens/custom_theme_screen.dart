@@ -119,7 +119,7 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
                 for (final (gname, keys) in _groups) ...[
                   Text(gname, style: Fizz.display(18, theme: t)),
                   const SizedBox(height: 6),
-                  for (final k in keys) _ColorRow(key: k),
+                  for (final k in keys) _ColorRow(colorKey: k),
                   const SizedBox(height: 10),
                 ],
                 const SizedBox(height: 24),
@@ -138,8 +138,8 @@ class _CustomThemeScreenState extends State<CustomThemeScreen> {
 }
 
 class _ColorRow extends StatelessWidget {
-  final String key;
-  const _ColorRow({required this.key});
+  final String colorKey;
+  const _ColorRow({required this.colorKey});
 
   static const _labels = {
     'bgDeep': 'Background deep',
@@ -166,7 +166,7 @@ class _ColorRow extends StatelessWidget {
         context.findAncestorStateOfType<_CustomThemeScreenState>()!;
     final s = state._s;
     final t = FizzThemes.byId(s.themeId, custom: s.customTheme);
-    final color = Color(s.customColors[key]!);
+    final color = Color(s.customColors[colorKey]!);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -185,27 +185,27 @@ class _ColorRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_labels[key] ?? key, style: Fizz.body(14, theme: t)),
+                Text(_labels[colorKey] ?? colorKey, style: Fizz.body(14, theme: t)),
                 _ChannelSlider(
                   theme: t,
                   label: 'R',
                   value: color.red / 255,
                   onChanged: (v) => s.setCustomColor(
-                      key, color.withRed((v * 255).round()).value),
+                      colorKey, color.withRed((v * 255).round()).value),
                 ),
                 _ChannelSlider(
                   theme: t,
                   label: 'G',
                   value: color.green / 255,
                   onChanged: (v) => s.setCustomColor(
-                      key, color.withGreen((v * 255).round()).value),
+                      colorKey, color.withGreen((v * 255).round()).value),
                 ),
                 _ChannelSlider(
                   theme: t,
                   label: 'B',
                   value: color.blue / 255,
                   onChanged: (v) => s.setCustomColor(
-                      key, color.withBlue((v * 255).round()).value),
+                      colorKey, color.withBlue((v * 255).round()).value),
                 ),
               ],
             ),
