@@ -84,7 +84,7 @@ class FizzSettings extends ChangeNotifier {
   int gamesPlayed = 0;
   int totalPops = 0;
   int bestCombo = 0;
-  bool isPro = false;
+  bool isPro = true; // everything unlocked — no Pro version
 
   /// Custom theme colors (ARGB ints). Defaults mirror Soda Classic.
   Map<String, int> customColors = Map.of(_defaultCustomColors);
@@ -159,7 +159,7 @@ class FizzSettings extends ChangeNotifier {
     gamesPlayed = p.getInt(_kGames) ?? 0;
     totalPops = p.getInt(_kPops) ?? 0;
     bestCombo = p.getInt(_kBestCombo) ?? 0;
-    isPro = p.getBool(_kIsPro) ?? false;
+    isPro = true; // everything unlocked
     for (final k in _defaultCustomColors.keys) {
       customColors[k] = p.getInt('$_kCustomPrefix$k') ?? _defaultCustomColors[k]!;
     }
