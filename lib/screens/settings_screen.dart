@@ -7,6 +7,7 @@ import '../theme/fizz_art.dart';
 import '../theme/fizz_themes.dart';
 import 'custom_theme_screen.dart';
 import 'pro_screen.dart';
+import '../transfer/transfer_ui.dart';
 
 /// Settings — soda-shop counter metaphor, theme-aware.
 class SettingsScreen extends StatefulWidget {
@@ -98,6 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+              TransferSaveTile(gameSlug: 'bubblepop'),
                 _SectionTitle('Sound', t),
                 SettingRow(
                   theme: t,
